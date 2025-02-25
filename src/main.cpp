@@ -10,7 +10,7 @@ bool readline(BufferedSerial &serial, char *buffer, bool is_integar = false, boo
 float duration_to_sec(const std::chrono::duration<float> &duration);
 
 int main()
-{
+{ 
     constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
     constexpr int motor_amount = 4;
@@ -20,10 +20,16 @@ int main()
     int motor_velocity[motor_amount] = {0};
     constexpr int wheel_radius = 50; // mm
     constexpr int robot_size = 300;  // mm
-
     constexpr int max_dps_trans = 20000;
     constexpr int max_dps_rot = 500;
 
+    bool is_c_indoroll = false;
+    bool is_b_indoroll = false;
+    bool pushed_L1 = false;
+    bool pushed_R1 = false;
+    float c_move = 0;
+    float c_rotate = 0;
+    float b_rotate = 0;
     constexpr bool is_calc = false;
 
     BufferedSerial pc(USBTX, USBRX, 115200);
@@ -90,13 +96,41 @@ int main()
                     }
                 }
             }
+            if (strcmp(data, "c_indo") == 0){
+            //    printf("Pushed Circle\n");
+                if(is_c_indoroll){
+                    is_c_indoroll = false;
+                }else{
+                    is_c_indoroll = true;
+                }
+            }
+            if (strcmp(data, "b_indo") == 0){
+            //    printf("Pushed Square\n");
+                if(is_b_indoroll){
+                    is_b_indoroll = false;
+                }else{
+                    is_b_indoroll = true;
+                }
+            }
+            if (strcmp(data, "c_up") == 0){
+                pushed_L1 = true;
+                pushed_R1 = false;
+            }
+            if (strcmp(data, "c_down") == 0){
+                pushed_L1 = false;
+                pushed_R1 = true;
+            }
+            if (strcmp(data, "c_stop") == 0){
+                pushed_L1 = false;
+                pushed_R1 = false;
+            }
         }
         if (now - pre > 10ms)
         {
             float elapsed = duration_to_sec(now - pre);
             // printf("encoder_diff: %d, %d, %d, %d\n", encoder_diff[0], encoder_diff[1], encoder_diff[2], encoder_diff[3]);
 
-            int16_t motor_output[motor_amount] = {0};
+             int16_t motor_output[motor_amount] = {0};
             if (is_calc)
             {
                 float theta_rad = atan2(velocity_xy[1], velocity_xy[0]);
@@ -139,9 +173,26 @@ int main()
             c620.write();
             pre = now;
         }
+
+        if(pushed_L1){
+            c_move = 10000;
+        }else if(pushed_R1){
+            c_move = -10000;
+        }else{
+            c_move = 0;
+        }
+        if(is_c_indoroll){
+            c_rotate = 8000;
+        }else{
+            c_rotate = 0;
+        }
+        if(is_b_indoroll){
+            b_rotate = 8000;
+        }else{
+            b_rotate = 0;
+        }
     }
 }
-
 bool readline(BufferedSerial &serial, char *buffer, const bool is_integar, const bool is_float)
 {
     int i = 0;       // 繰り返し変数

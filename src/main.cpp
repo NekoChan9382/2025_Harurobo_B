@@ -39,10 +39,147 @@ int main()
 
     
     bool is_t_conv = false;
-    int conv_t_speed = 0;
+    int box_status = status::STOP;
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long  
+    conv_t_speed = 0;
     int stone_speed = 0;
-    int box_ = 0;
-    int OU4 = 0;
+    int box_output = 0;
+    int cone_out_output = 0;
 
     BufferedSerial pc(USBTX, USBRX, 115200);
     // BufferedSerial controller(PA_9, PA_10, 115200);
@@ -187,9 +324,27 @@ int main()
                 stone_speed = 0;
             }
             if(strcmp(data, "k_up") == 0){
-
+                box_status = status::UP;
+            }else if(strcmp(data, "k_down") == 0){
+                box_status = status::DOWN;
+            }else if(strcmp(data, "k_stop") == 0){
+                box_status = status::STOP;
             }
-
+            if(box_status == status::UP){
+                box_output = 5000;
+            }else if(box_status == status::DOWN){
+                box_output = -5000;
+            }else{
+                box_output = 0;
+            }
+            if (strcmp(data, "c_push") == 0)
+            {
+                cone_out_output = 10000;
+            }
+            else if (strcmp(data, "c_push_s") == 0)
+            {
+                cone_out_output = 0;
+            }
 
             if (now - pre > 10ms)
             {

@@ -10,7 +10,11 @@ bool readline(BufferedSerial &serial, char *buffer, bool is_integar = false, boo
 float duration_to_sec(const std::chrono::duration<float> &duration);
 
 int main()
-{ 
+{   
+    CAN can1(PA_11, PA_12, (int)1e6);
+    int16_t pwm1[4] = {0, 0, 0, 0};    // pwm配列
+    int16_t pwm2[4] = {0, 0, 0, 0};    // pwm配列
+    int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
     constexpr int motor_amount = 4;
@@ -123,6 +127,9 @@ int main()
             if (strcmp(data, "c_stop") == 0){
                 pushed_L1 = false;
                 pushed_R1 = false;
+            }
+            if (strcmp(data, "b_up") == 0){
+                b_rotate = 8000;
             }
         }
         if (now - pre > 10ms)

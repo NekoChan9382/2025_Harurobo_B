@@ -12,9 +12,14 @@ float duration_to_sec(const std::chrono::duration<float> &duration);
 int main()
 {   
     CAN can1(PA_11, PA_12, (int)1e6);
-    int16_t pwm1[4] = {0, 0, 0, 0};    // pwm配列
-    int16_t pwm2[4] = {0, 0, 0, 0};    // pwm配列
+    int16_t pwm1[4] = {0, 0, 0, 0};    // pwm配列,zassou
+    int16_t pwm2[4] = {0, 0, 0, 0};    // pwm配列,nyayuta
     int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    CANMessage msg1;
+    CANMessage msg2;
+    int CAN_ID = 2;
+    int CAN_ID2 = 3;
+
     constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
     constexpr int motor_amount = 4;
@@ -31,9 +36,11 @@ int main()
     bool is_b_indoroll = false;
     bool pushed_L1 = false;
     bool pushed_R1 = false;
+    bool move_belt = false;
     float c_move = 0;
     float c_rotate = 0;
     float b_rotate = 0;
+    float conv_speed = 0;
     constexpr bool is_calc = false;
 
     BufferedSerial pc(USBTX, USBRX, 115200);
@@ -128,8 +135,12 @@ int main()
                 pushed_L1 = false;
                 pushed_R1 = false;
             }
-            if (strcmp(data, "b_up") == 0){
-                b_rotate = 8000;
+            if (strcmp(data, "conv") == 0){
+                if(move_belt){
+                    move_belt = false;
+                }else{
+                    move_belt = true;
+                }
             }
         }
         if (now - pre > 10ms)
@@ -188,16 +199,29 @@ int main()
         }else{
             c_move = 0;
         }
+
         if(is_c_indoroll){
             c_rotate = 8000;
         }else{
             c_rotate = 0;
         }
+
         if(is_b_indoroll){
             b_rotate = 8000;
         }else{
             b_rotate = 0;
         }
+
+        if(move_belt){
+            conv_speed = 10000;
+        }else{
+            conv_speed = 0;
+        }
+
+        pwm2 = {c_rotate, b_rotate, c_move, conv_speed};
+
+        CANMessage msg2(CAN_ID2, (const uint8_t *)&pwm2, 8);
+        can1.write(msg2);
     }
 }
 bool readline(BufferedSerial &serial, char *buffer, const bool is_integar, const bool is_float)

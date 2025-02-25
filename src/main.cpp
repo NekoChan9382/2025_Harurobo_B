@@ -8,12 +8,13 @@
 
 bool readline(BufferedSerial &serial, char *buffer, bool is_integar = false, bool is_float = false);
 float duration_to_sec(const std::chrono::duration<float> &duration);
+enum class status;
 
 int main()
-{   
+{
     CAN can1(PA_11, PA_12, (int)1e6);
-    int16_t pwm1[4] = {0, 0, 0, 0};    // pwm配列
-    int16_t pwm2[4] = {0, 0, 0, 0};    // pwm配列
+    int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
+    int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
     int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
@@ -35,6 +36,13 @@ int main()
     float c_rotate = 0;
     float b_rotate = 0;
     constexpr bool is_calc = false;
+
+    
+    bool is_t_conv = false;
+    int conv_t_speed = 0;
+    int stone_speed = 0;
+    int box_ = 0;
+    int OU4 = 0;
 
     BufferedSerial pc(USBTX, USBRX, 115200);
     // BufferedSerial controller(PA_9, PA_10, 115200);
@@ -100,103 +108,166 @@ int main()
                     }
                 }
             }
-            if (strcmp(data, "c_indo") == 0){
-            //    printf("Pushed Circle\n");
-                if(is_c_indoroll){
+            if (strcmp(data, "c_indo") == 0)
+            {
+                //    printf("Pushed Circle\n");
+                if (is_c_indoroll)
+                {
                     is_c_indoroll = false;
-                }else{
+                }
+                else
+                {
                     is_c_indoroll = true;
                 }
             }
-            if (strcmp(data, "b_indo") == 0){
-            //    printf("Pushed Square\n");
-                if(is_b_indoroll){
+            if (strcmp(data, "b_indo") == 0)
+            {
+                //    printf("Pushed Square\n");
+                if (is_b_indoroll)
+                {
                     is_b_indoroll = false;
-                }else{
+                }
+                else
+                {
                     is_b_indoroll = true;
                 }
             }
-            if (strcmp(data, "c_up") == 0){
+            if (strcmp(data, "c_up") == 0)
+            {
                 pushed_L1 = true;
                 pushed_R1 = false;
             }
-            if (strcmp(data, "c_down") == 0){
+            if (strcmp(data, "c_down") == 0)
+            {
                 pushed_L1 = false;
                 pushed_R1 = true;
             }
-            if (strcmp(data, "c_stop") == 0){
+            if (strcmp(data, "c_stop") == 0)
+            {
                 pushed_L1 = false;
                 pushed_R1 = false;
             }
-            if (strcmp(data, "b_up") == 0){
-                b_rotate = 8000;
-            }
-        }
-        if (now - pre > 10ms)
-        {
-            float elapsed = duration_to_sec(now - pre);
-            // printf("encoder_diff: %d, %d, %d, %d\n", encoder_diff[0], encoder_diff[1], encoder_diff[2], encoder_diff[3]);
 
-             int16_t motor_output[motor_amount] = {0};
-            if (is_calc)
+
+
+
+            if (strcmp(data, "sort_t") == 0)
             {
-                float theta_rad = atan2(velocity_xy[1], velocity_xy[0]);
-                float output_power = hypot(velocity_xy[0], velocity_xy[1]);
-                // printf("output_power: %f\n", output_power);
-                for (int i = 0; i < motor_amount; i++)
+                servo1[0] = 112;
+            }
+            else if (strcmp(data, "sort_s") == 0)
+            {
+                servo1[0] = 144;
+            }
+            if (strcmp(data, "t_conv") == 0)
+            {
+                if (is_t_conv)
                 {
-                    float rmp_to_rad = 2 * M_PI / 60;
-                    float motor_dps = c620.get_rpm(i + 1) * rmp_to_rad;
-                    float motor_ang = i * M_PI / 2;
-                    float motor_offset = M_PI / 4;
-                    float goal_ang_vel = (sin(theta_rad - (motor_ang + motor_offset)) * output_power + velocity_ang * robot_size) / wheel_radius;
-                    // printf("goal_ang_vel %d: %f, dps: %f\n", i, goal_ang_vel, motor_dps);
-                    const float out = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
-                    printf("out: %f\n", out);
-                    c620.set_output_percent(out, i + 1);
-                    // c620.set_output(0, i+1);
+                    is_t_conv = false; // 回転停止
                 }
+                else
+                {
+                    is_t_conv = true; // 回転開始
+                }
+            }
+            if (is_t_conv)
+            {
+                conv_t_speed = 16000;
             }
             else
             {
+                conv_t_speed = 0;
+            }
+            if (strcmp(data, "b_launch") == 0)
+            {
+                stone_speed = 18000;
+            }
+            else if (strcmp(data, "b_launch_s") == 0)
+            {
+                stone_speed = 0;
+            }
+            if(strcmp(data, "k_up") == 0){
+
+            }
+
+
+            if (now - pre > 10ms)
+            {
+                float elapsed = duration_to_sec(now - pre);
+                // printf("encoder_diff: %d, %d, %d, %d\n", encoder_diff[0], encoder_diff[1], encoder_diff[2], encoder_diff[3]);
+
+                int16_t motor_output[motor_amount] = {0};
+                if (is_calc)
+                {
+                    float theta_rad = atan2(velocity_xy[1], velocity_xy[0]);
+                    float output_power = hypot(velocity_xy[0], velocity_xy[1]);
+                    // printf("output_power: %f\n", output_power);
+                    for (int i = 0; i < motor_amount; i++)
+                    {
+                        float rmp_to_rad = 2 * M_PI / 60;
+                        float motor_dps = c620.get_rpm(i + 1) * rmp_to_rad;
+                        float motor_ang = i * M_PI / 2;
+                        float motor_offset = M_PI / 4;
+                        float goal_ang_vel = (sin(theta_rad - (motor_ang + motor_offset)) * output_power + velocity_ang * robot_size) / wheel_radius;
+                        // printf("goal_ang_vel %d: %f, dps: %f\n", i, goal_ang_vel, motor_dps);
+                        const float out = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
+                        printf("out: %f\n", out);
+                        c620.set_output_percent(out, i + 1);
+                        // c620.set_output(0, i+1);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < motor_amount; i++)
+                    {
+                        float rmp_to_rad = 2 * M_PI / 60;
+                        float motor_dps = c620.get_rpm(i + 1) * rmp_to_rad;
+                        int goal_ang_vel = motor_velocity[i];
+                        const float percent = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
+                        const int out = percent * dji_max_output;
+                        printf("dps: %f, goal: %d, out: %d\n", motor_dps, goal_ang_vel, out);
+
+                        c620.set_output(out, i + 1);
+                    }
+                }
                 for (int i = 0; i < motor_amount; i++)
                 {
-                    float rmp_to_rad = 2 * M_PI / 60;
-                    float motor_dps = c620.get_rpm(i + 1) * rmp_to_rad;
-                    int goal_ang_vel = motor_velocity[i];
-                    const float percent = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
-                    const int out = percent * dji_max_output;
-                    printf("dps: %f, goal: %d, out: %d\n", motor_dps, goal_ang_vel, out);
-
-                    c620.set_output(out, i + 1);
+                    motor_output[i] = c620.get_current(i + 1);
                 }
+                printf("motor_output: %d, %d, %d, %d\n", motor_output[0], motor_output[1], motor_output[2], motor_output[3]);
+                // printf("motor_dps: %d, %d, %d, %d\n", motor_dps[0], motor_dps[1], motor_dps[2], motor_dps[3]);
+                c620.write();
+                pre = now;
             }
-            for (int i = 0; i < motor_amount; i++)
-            {
-                motor_output[i] = c620.get_current(i + 1);
-            }
-            printf("motor_output: %d, %d, %d, %d\n", motor_output[0], motor_output[1], motor_output[2], motor_output[3]);
-            // printf("motor_dps: %d, %d, %d, %d\n", motor_dps[0], motor_dps[1], motor_dps[2], motor_dps[3]);
-            c620.write();
-            pre = now;
-        }
 
-        if(pushed_L1){
-            c_move = 10000;
-        }else if(pushed_R1){
-            c_move = -10000;
-        }else{
-            c_move = 0;
-        }
-        if(is_c_indoroll){
-            c_rotate = 8000;
-        }else{
-            c_rotate = 0;
-        }
-        if(is_b_indoroll){
-            b_rotate = 8000;
-        }else{
-            b_rotate = 0;
+            if (pushed_L1)
+            {
+                c_move = 10000;
+            }
+            else if (pushed_R1)
+            {
+                c_move = -10000;
+            }
+            else
+            {
+                c_move = 0;
+            }
+            if (is_c_indoroll)
+            {
+                c_rotate = 8000;
+            }
+            else
+            {
+                c_rotate = 0;
+            }
+            if (is_b_indoroll)
+            {
+                b_rotate = 8000;
+            }
+            else
+            {
+                b_rotate = 0;
+            }
         }
     }
 }
@@ -247,4 +318,11 @@ bool readline(BufferedSerial &serial, char *buffer, const bool is_integar, const
 float duration_to_sec(const std::chrono::duration<float> &duration)
 {
     return duration.count();
+}
+
+enum class status
+{
+    STOP,
+    UP,
+    DOWN,
 }

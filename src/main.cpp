@@ -36,11 +36,11 @@ int main()
     bool is_b_indoroll = false;
     bool pushed_L1 = false;
     bool pushed_R1 = false;
-    bool move_belt = false;
+    bool c_move_belt = false;
     float c_move = 0;
     float c_rotate = 0;
     float b_rotate = 0;
-    float conv_speed = 0;
+    float c_conv_speed = 0;
     constexpr bool is_calc = false;
 
     BufferedSerial pc(USBTX, USBRX, 115200);
@@ -135,11 +135,11 @@ int main()
                 pushed_L1 = false;
                 pushed_R1 = false;
             }
-            if (strcmp(data, "conv") == 0){
-                if(move_belt){
-                    move_belt = false;
+            if (strcmp(data, "c_conv") == 0){
+                if(c_move_belt){
+                    c_move_belt = false;
                 }else{
-                    move_belt = true;
+                    c_move_belt = true;
                 }
             }
         }
@@ -212,10 +212,10 @@ int main()
             b_rotate = 0;
         }
 
-        if(move_belt){
-            conv_speed = 10000;
+        if(c_move_belt){
+            c_conv_speed = 10000;
         }else{
-            conv_speed = 0;
+            c_conv_speed = 0;
         }
 
         pwm2 = {c_rotate, b_rotate, c_move, conv_speed};

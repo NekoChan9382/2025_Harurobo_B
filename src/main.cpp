@@ -218,7 +218,7 @@ int main()
             c_conv_speed = 0;
         }
 
-        pwm2 = {c_rotate, b_rotate, c_move, conv_speed};
+        pwm2 = {c_rotate, b_rotate, c_move, c_conv_speed};
 
         CANMessage msg2(CAN_ID2, (const uint8_t *)&pwm2, 8);
         can1.write(msg2);

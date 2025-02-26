@@ -18,11 +18,12 @@ int main()
     int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     CANMessage msg1;
     CANMessage msg2;
-    int CAN_ID1 = 2; // 後で変える
-    int CAN_ID2 = 3;
-    　 //同上
+    CANMessage msg_servo;
+    constexpr int CAN_ID1 = 2; // 後で変える
+    constexpr int CAN_ID2 = 3;
+    constexpr int CAN_ID_SERVO = 141;
 
-        constexpr int pid_max = 1;
+    constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
     constexpr int motor_amount = 4;
     int velocity_xy[2] = {0}; // x, y, ang
@@ -37,7 +38,7 @@ int main()
     bool is_c_indoroll = false;
     bool is_b_indoroll = false;
     bool c_move_belt = false;
-    int c_direction = c_state::stop;
+    int c_direction = c_state::STOP;
     float c_move = 0;
     float c_rotate = 0;
     float b_rotate = 0;
@@ -45,7 +46,7 @@ int main()
     constexpr bool is_calc = false;
 
     bool is_t_conv = false;
-    int box_status = status::STOP;
+    int box_status = c_state::STOP;
     int conv_t_speed = 0;
     int stone_speed = 0;
     int box_output = 0;
@@ -148,21 +149,21 @@ int main()
             }
             if (strcmp(data, "k_up") == 0)
             {
-                box_status = status::UP;
+                box_status = c_state::UP;
             }
             else if (strcmp(data, "k_down") == 0)
             {
-                box_status = status::DOWN;
+                box_status = c_state::DOWN;
             }
             else if (strcmp(data, "k_stop") == 0)
             {
-                box_status = status::STOP;
+                box_status = c_state::STOP;
             }
-            if (box_status == status::UP)
+            if (box_status == c_state::UP)
             {
                 pwm1[2] = 5000;
             }
-            else if (box_status == status::DOWN)
+            else if (box_status == c_state::DOWN)
             {
                 pwm1[2] = -5000;
             }
@@ -205,21 +206,21 @@ int main()
             }
             if (strcmp(data, "c_up") == 0)
             {
-                c_direction = c_state::up;
+                c_direction = c_state::UP;
             }
             if (strcmp(data, "c_down") == 0)
             {
-                c_direction = c_state::down;
+                c_direction = c_state::DOWN;
             }
             if (strcmp(data, "c_stop") == 0)
             {
-                c_direction = c_state::stop;
+                c_direction = c_state::STOP;
             }
-            if (c_direction == c_state::up)
+            if (c_direction == c_state::UP)
             {
                 c_move = 10000;
             }
-            else if (c_direction == c_state::down)
+            else if (c_direction == c_state::DOWN)
             {
                 c_move = -10000;
             }
@@ -360,7 +361,7 @@ float duration_to_sec(const std::chrono::duration<float> &duration)
 
 enum class c_state
 {
-    up,
-    down,
-    stop
+    UP,
+    DOWN,
+    STOP
 };

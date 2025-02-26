@@ -313,8 +313,14 @@ int main()
             printf("motor_output: %d, %d, %d, %d\n", motor_output[0], motor_output[1], motor_output[2], motor_output[3]);
             // printf("motor_dps: %d, %d, %d, %d\n", motor_dps[0], motor_dps[1], motor_dps[2], motor_dps[3]);
             c620.write();
+            
+            CANMessage msg1(CAN_ID1, (const uint8_t *)&pwm1, 8);
             CANMessage msg2(CAN_ID2, (const uint8_t *)&pwm2, 8);
+            CANMessage msg_servo(CAN_ID_SERVO, (const uint8_t *)&servo1, 8);
+            can1.write(msg1);
             can1.write(msg2);
+            can1.write(msg_servo);
+
             pre = now;
         }
     }

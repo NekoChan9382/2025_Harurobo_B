@@ -8,17 +8,18 @@
 
 bool readline(BufferedSerial &serial, char *buffer, bool is_integar = false, bool is_float = false);
 float duration_to_sec(const std::chrono::duration<float> &duration);
+enum class c_state;
 
 int main()
 {   
     CAN can1(PA_11, PA_12, (int)1e6);
     int16_t pwm1[4] = {0, 0, 0, 0};    // pwm配列,zassou
-    int16_t pwm2[4] = {0, 0, 0, 0};    // pwm配列,nyayuta
+    int16_t pwm2[4] = {0, 0, 0, 0};    //    pwm配列,nyayuta
     int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     CANMessage msg1;
     CANMessage msg2;
-    int CAN_ID = 2;
-    int CAN_ID2 = 3;
+    int CAN_ID1= 2;     //後で変える
+    int CAN_ID2 = 3;  　//同上
 
     constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
@@ -34,9 +35,8 @@ int main()
 
     bool is_c_indoroll = false;
     bool is_b_indoroll = false;
-    bool pushed_L1 = false;
-    bool pushed_R1 = false;
     bool c_move_belt = false;
+    int c_direction = c_state::stop;
     float c_move = 0;
     float c_rotate = 0;
     float b_rotate = 0;
@@ -124,16 +124,13 @@ int main()
                 }
             }
             if (strcmp(data, "c_up") == 0){
-                pushed_L1 = true;
-                pushed_R1 = false;
+                c_direction = c_state::up;
             }
             if (strcmp(data, "c_down") == 0){
-                pushed_L1 = false;
-                pushed_R1 = true;
+                c_direction = c_state::down;
             }
             if (strcmp(data, "c_stop") == 0){
-                pushed_L1 = false;
-                pushed_R1 = false;
+                c_direction = c_state::stop;
             }
             if (strcmp(data, "c_conv") == 0){
                 if(c_move_belt){
@@ -192,9 +189,9 @@ int main()
             pre = now;
         }
 
-        if(pushed_L1){
+        if(c_direction == c_state::up){
             c_move = 10000;
-        }else if(pushed_R1){
+        }else if(c_direction == c_state::down){
             c_move = -10000;
         }else{
             c_move = 0;
@@ -218,7 +215,7 @@ int main()
             c_conv_speed = 0;
         }
 
-        pwm2 = {c_rotate, b_rotate, c_move, c_conv_speed};
+        pwm2 = {c_rotate, b_rotate, c_move, c_conv_speed}; //配列は適当、修正必至
 
         CANMessage msg2(CAN_ID2, (const uint8_t *)&pwm2, 8);
         can1.write(msg2);
@@ -272,3 +269,10 @@ float duration_to_sec(const std::chrono::duration<float> &duration)
 {
     return duration.count();
 }
+
+enum class c_state
+{
+    up,
+    down,
+    stop
+};

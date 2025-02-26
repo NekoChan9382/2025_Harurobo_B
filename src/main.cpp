@@ -8,7 +8,13 @@
 
 bool readline(BufferedSerial &serial, char *buffer, bool is_integar = false, bool is_float = false);
 float duration_to_sec(const std::chrono::duration<float> &duration);
-enum class c_state;
+
+enum class c_state
+{
+    UP,
+    DOWN,
+    STOP
+};
 
 int main()
 {
@@ -38,15 +44,15 @@ int main()
     bool is_c_indoroll = false;
     bool is_b_indoroll = false;
     bool c_move_belt = false;
-    int c_direction = c_state::STOP;
-    float c_move = 0;
-    float c_rotate = 0;
-    float b_rotate = 0;
-    float c_conv_speed = 0;
+    auto c_direction = c_state::STOP;
+    int c_move = 0;
+    int c_rotate = 0;
+    int b_rotate = 0;
+    int c_conv_speed = 0;
     constexpr bool is_calc = false;
 
     bool is_t_conv = false;
-    int box_status = c_state::STOP;
+    auto box_status = c_state::STOP;
     int conv_t_speed = 0;
     int stone_speed = 0;
     int box_output = 0;
@@ -256,7 +262,10 @@ int main()
                 c_conv_speed = 0;
             }
 
-            pwm2 = {c_rotate, b_rotate, c_move, c_conv_speed}; // 配列は適当、修正必至
+            pwm2[0] = c_rotate;
+            pwm2[1] = b_rotate;
+            pwm2[2] = c_move;
+            pwm2[3] = c_conv_speed;
         }
         if (now - pre > 10ms)
         {
@@ -359,9 +368,3 @@ float duration_to_sec(const std::chrono::duration<float> &duration)
     return duration.count();
 }
 
-enum class c_state
-{
-    UP,
-    DOWN,
-    STOP
-};

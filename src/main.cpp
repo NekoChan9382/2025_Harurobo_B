@@ -11,17 +11,18 @@ float duration_to_sec(const std::chrono::duration<float> &duration);
 enum class c_state;
 
 int main()
-{   
+{
     CAN can1(PA_11, PA_12, (int)1e6);
-    int16_t pwm1[4] = {0, 0, 0, 0};    // pwm配列,zassou
-    int16_t pwm2[4] = {0, 0, 0, 0};    //    pwm配列,nyayuta
+    int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列  [0]: 宝コンベア, [1]: ボール発射, [2]: かごつかみ, [3]: コーン押出
+    int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
     int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     CANMessage msg1;
     CANMessage msg2;
-    int CAN_ID1= 2;     //後で変える
-    int CAN_ID2 = 3;  　//同上
+    int CAN_ID1 = 2; // 後で変える
+    int CAN_ID2 = 3;
+    　 //同上
 
-    constexpr int pid_max = 1;
+        constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
     constexpr int motor_amount = 4;
     int velocity_xy[2] = {0}; // x, y, ang
@@ -42,6 +43,13 @@ int main()
     float b_rotate = 0;
     float c_conv_speed = 0;
     constexpr bool is_calc = false;
+
+    bool is_t_conv = false;
+    int box_status = status::STOP;
+    int conv_t_speed = 0;
+    int stone_speed = 0;
+    int box_output = 0;
+    int cone_out_output = 0;
 
     BufferedSerial pc(USBTX, USBRX, 115200);
     // BufferedSerial controller(PA_9, PA_10, 115200);
@@ -107,45 +115,154 @@ int main()
                     }
                 }
             }
-            if (strcmp(data, "c_indo") == 0){
-            //    printf("Pushed Circle\n");
-                if(is_c_indoroll){
+
+            if (strcmp(data, "sort_t") == 0)
+            {
+                servo1[0] = 112;
+            }
+            else if (strcmp(data, "sort_s") == 0)
+            {
+                servo1[0] = 144;
+            }
+            if (strcmp(data, "t_conv") == 0)
+            {
+                is_t_conv = !is_t_conv;
+
+                if (is_t_conv)
+                {
+                    pwm1[0] = 16000;
+                }
+                else
+                {
+                    pwm1[0] = 0;
+                }
+            }
+
+            if (strcmp(data, "b_launch") == 0)
+            {
+                pwm1[1] = 18000;
+            }
+            else if (strcmp(data, "b_launch_s") == 0)
+            {
+                pwm1[1] = 0;
+            }
+            if (strcmp(data, "k_up") == 0)
+            {
+                box_status = status::UP;
+            }
+            else if (strcmp(data, "k_down") == 0)
+            {
+                box_status = status::DOWN;
+            }
+            else if (strcmp(data, "k_stop") == 0)
+            {
+                box_status = status::STOP;
+            }
+            if (box_status == status::UP)
+            {
+                pwm1[2] = 5000;
+            }
+            else if (box_status == status::DOWN)
+            {
+                pwm1[2] = -5000;
+            }
+            else
+            {
+                pwm1[2] = 0;
+            }
+            if (strcmp(data, "c_push") == 0)
+            {
+                pwm1[3] = 10000;
+            }
+            else if (strcmp(data, "c_push_s") == 0)
+            {
+                pwm1[3] = 0;
+            }
+
+            if (strcmp(data, "c_indo") == 0)
+            {
+                //    printf("Pushed Circle\n");
+                if (is_c_indoroll)
+                {
                     is_c_indoroll = false;
-                }else{
+                }
+                else
+                {
                     is_c_indoroll = true;
                 }
             }
-            if (strcmp(data, "b_indo") == 0){
-            //    printf("Pushed Square\n");
-                if(is_b_indoroll){
+            if (strcmp(data, "b_indo") == 0)
+            {
+                //    printf("Pushed Square\n");
+                if (is_b_indoroll)
+                {
                     is_b_indoroll = false;
-                }else{
+                }
+                else
+                {
                     is_b_indoroll = true;
                 }
             }
-            if (strcmp(data, "c_up") == 0){
+            if (strcmp(data, "c_up") == 0)
+            {
                 c_direction = c_state::up;
             }
-            if (strcmp(data, "c_down") == 0){
+            if (strcmp(data, "c_down") == 0)
+            {
                 c_direction = c_state::down;
             }
-            if (strcmp(data, "c_stop") == 0){
+            if (strcmp(data, "c_stop") == 0)
+            {
                 c_direction = c_state::stop;
             }
-            if (strcmp(data, "c_conv") == 0){
-                if(c_move_belt){
-                    c_move_belt = false;
-                }else{
-                    c_move_belt = true;
-                }
+            if (c_direction == c_state::up)
+            {
+                c_move = 10000;
             }
+            else if (c_direction == c_state::down)
+            {
+                c_move = -10000;
+            }
+            else
+            {
+                c_move = 0;
+            }
+
+            if (is_c_indoroll)
+            {
+                c_rotate = 8000;
+            }
+            else
+            {
+                c_rotate = 0;
+            }
+
+            if (is_b_indoroll)
+            {
+                b_rotate = 8000;
+            }
+            else
+            {
+                b_rotate = 0;
+            }
+
+            if (c_move_belt)
+            {
+                c_conv_speed = 10000;
+            }
+            else
+            {
+                c_conv_speed = 0;
+            }
+
+            pwm2 = {c_rotate, b_rotate, c_move, c_conv_speed}; // 配列は適当、修正必至
         }
         if (now - pre > 10ms)
         {
             float elapsed = duration_to_sec(now - pre);
             // printf("encoder_diff: %d, %d, %d, %d\n", encoder_diff[0], encoder_diff[1], encoder_diff[2], encoder_diff[3]);
 
-             int16_t motor_output[motor_amount] = {0};
+            int16_t motor_output[motor_amount] = {0};
             if (is_calc)
             {
                 float theta_rad = atan2(velocity_xy[1], velocity_xy[0]);
@@ -186,39 +303,10 @@ int main()
             printf("motor_output: %d, %d, %d, %d\n", motor_output[0], motor_output[1], motor_output[2], motor_output[3]);
             // printf("motor_dps: %d, %d, %d, %d\n", motor_dps[0], motor_dps[1], motor_dps[2], motor_dps[3]);
             c620.write();
+            CANMessage msg2(CAN_ID2, (const uint8_t *)&pwm2, 8);
+            can1.write(msg2);
             pre = now;
         }
-
-        if(c_direction == c_state::up){
-            c_move = 10000;
-        }else if(c_direction == c_state::down){
-            c_move = -10000;
-        }else{
-            c_move = 0;
-        }
-
-        if(is_c_indoroll){
-            c_rotate = 8000;
-        }else{
-            c_rotate = 0;
-        }
-
-        if(is_b_indoroll){
-            b_rotate = 8000;
-        }else{
-            b_rotate = 0;
-        }
-
-        if(c_move_belt){
-            c_conv_speed = 10000;
-        }else{
-            c_conv_speed = 0;
-        }
-
-        pwm2 = {c_rotate, b_rotate, c_move, c_conv_speed}; //配列は適当、修正必至
-
-        CANMessage msg2(CAN_ID2, (const uint8_t *)&pwm2, 8);
-        can1.write(msg2);
     }
 }
 bool readline(BufferedSerial &serial, char *buffer, const bool is_integar, const bool is_float)

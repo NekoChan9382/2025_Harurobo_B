@@ -13,7 +13,7 @@ enum class status;
 int main()
 {
     CAN can1(PA_11, PA_12, (int)1e6);
-    int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
+    int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列  [0]: 宝コンベア, [1]: ボール発射, [2]: かごつかみ, [3]: コーン押出
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
     int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     constexpr int pid_max = 1;
@@ -37,7 +37,6 @@ int main()
     float b_rotate = 0;
     constexpr bool is_calc = false;
 
-    
     bool is_t_conv = false;
     int box_status = status::STOP;
     int conv_t_speed = 0;
@@ -149,9 +148,6 @@ int main()
                 pushed_R1 = false;
             }
 
-
-
-
             if (strcmp(data, "sort_t") == 0)
             {
                 servo1[0] = 112;
@@ -162,53 +158,57 @@ int main()
             }
             if (strcmp(data, "t_conv") == 0)
             {
+                is_t_conv = !is_t_conv;
+
                 if (is_t_conv)
                 {
-                    is_t_conv = false; // 回転停止
+                    pwm1[0] = 16000;
                 }
                 else
                 {
-                    is_t_conv = true; // 回転開始
+                    pwm1[0] = 0;
                 }
             }
-            if (is_t_conv)
-            {
-                conv_t_speed = 16000;
-            }
-            else
-            {
-                conv_t_speed = 0;
-            }
+
             if (strcmp(data, "b_launch") == 0)
             {
-                stone_speed = 18000;
+                pwm1[1] = 18000;
             }
             else if (strcmp(data, "b_launch_s") == 0)
             {
-                stone_speed = 0;
+                pwm1[1] = 0;
             }
-            if(strcmp(data, "k_up") == 0){
+            if (strcmp(data, "k_up") == 0)
+            {
                 box_status = status::UP;
-            }else if(strcmp(data, "k_down") == 0){
+            }
+            else if (strcmp(data, "k_down") == 0)
+            {
                 box_status = status::DOWN;
-            }else if(strcmp(data, "k_stop") == 0){
+            }
+            else if (strcmp(data, "k_stop") == 0)
+            {
                 box_status = status::STOP;
             }
-            if(box_status == status::UP){
-                box_output = 5000;
-            }else if(box_status == status::DOWN){
-                box_output = -5000;
-            }else{
-                box_output = 0;
+            if (box_status == status::UP)
+            {
+                pwm1[2] = 5000;
+            }
+            else if (box_status == status::DOWN)
+            {
+                pwm1[2] = -5000;
+            }
+            else
+            {
+                pwm1[2] = 0;
             }
             if (strcmp(data, "c_push") == 0)
             {
-                cone_out_output = 10000;
+                pwm1[3] = 10000;
             }
             else if (strcmp(data, "c_push_s") == 0)
             {
-                cone_out_output = 
-                0;
+                pwm1[3] = 0;
             }
 
             if (now - pre > 10ms)

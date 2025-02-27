@@ -131,7 +131,7 @@ int main()
             {
                 servo1[0] = 144;
             }
-            if (strcmp(data, "t_conv") == 0)
+            if (strcmp(data, "b_conv") == 0)
             {
                 is_t_conv = !is_t_conv;
 

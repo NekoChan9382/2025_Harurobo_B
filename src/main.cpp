@@ -189,26 +189,12 @@ int main()
             if (strcmp(data, "c_indo") == 0)
             {
                 //    printf("Pushed Circle\n");
-                if (is_c_indoroll)
-                {
-                    is_c_indoroll = false;
-                }
-                else
-                {
-                    is_c_indoroll = true;
-                }
+                is_c_indoroll = !is_c_indoroll;
             }
             if (strcmp(data, "b_indo") == 0)
             {
                 //    printf("Pushed Square\n");
-                if (is_b_indoroll)
-                {
-                    is_b_indoroll = false;
-                }
-                else
-                {
-                    is_b_indoroll = true;
-                }
+                is_b_indoroll = !is_b_indoroll;
             }
             if (strcmp(data, "c_up") == 0)
             {

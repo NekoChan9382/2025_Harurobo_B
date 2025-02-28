@@ -59,10 +59,6 @@ int main()
 
     bool is_t_conv = false;
     auto box_status = c_state::STOP;
-    int conv_t_speed = 0;
-    int stone_speed = 0;
-    int box_output = 0;
-    int cone_out_output = 0;
 
     CAN can(PA_11, PA_12, 1000000);
     CANMessage msg_encoder;

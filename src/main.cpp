@@ -1,5 +1,11 @@
 #include <mbed.h>
 
+/*TODO
+・NeoPixelのシリアル制御
+・c_pushの削除(bit)
+・新しいサーボの処理追加
+*/
+
 /// @Tips mm rad s
 #include <PID_new.hpp>
 #include <cmath>

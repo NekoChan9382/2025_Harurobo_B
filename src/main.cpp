@@ -26,7 +26,7 @@ enum class c_state
 int main()
 {
     CAN can1(PA_11, PA_12, (int)1e6);
-    int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列  [0]: 宝コンベア, [1]: ボール発射, [2]: かごつかみ, [3]: コーン押出
+    int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
     int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     CANMessage msg1;

@@ -6,6 +6,7 @@
 #include <array>
 #include <C620.hpp>
 
+
 bool readline(BufferedSerial &serial, char *buffer, bool is_integar = false, bool is_float = false);
 float duration_to_sec(const std::chrono::duration<float> &duration);
 
@@ -44,11 +45,17 @@ int main()
     bool is_c_indoroll = false;
     bool is_b_indoroll = false;
     bool c_move_belt = false;
+    bool is_b_throw = false;
+    bool is_c_push = false;
     auto c_direction = c_state::STOP;
     int c_move = 0;
     int c_rotate = 0;
     int b_rotate = 0;
     int c_conv_speed = 0;
+    int t_conv_speed = 0;
+    int b_throw_speed = 0;
+    int box_catch = 0;
+    int c_push = 0;
     constexpr bool is_calc = false;
 
     bool is_t_conv = false;
@@ -134,20 +141,11 @@ int main()
             if (strcmp(data, "b_conv") == 0)
             {
                 is_t_conv = !is_t_conv;
-
-                if (is_t_conv)
-                {
-                    pwm1[0] = 16000;
-                }
-                else
-                {
-                    pwm1[0] = 0;
-                }
             }
 
             if (strcmp(data, "b_launch") == 0)
             {
-                pwm1[1] = 18000;
+                is_b_throw = !is_b_throw;
             }
             else if (strcmp(data, "b_launch_s") == 0)
             {
@@ -165,25 +163,13 @@ int main()
             {
                 box_status = c_state::STOP;
             }
-            if (box_status == c_state::UP)
-            {
-                pwm1[2] = 5000;
-            }
-            else if (box_status == c_state::DOWN)
-            {
-                pwm1[2] = -5000;
-            }
-            else
-            {
-                pwm1[2] = 0;
-            }
             if (strcmp(data, "c_push") == 0)
             {
-                pwm1[3] = 10000;
+                is_c_push = true;
             }
             else if (strcmp(data, "c_push_s") == 0)
             {
-                pwm1[3] = 0;
+                is_c_push = false;
             }
 
             if (strcmp(data, "c_indo") == 0)
@@ -208,6 +194,8 @@ int main()
             {
                 c_direction = c_state::STOP;
             }
+
+
             if (c_direction == c_state::UP)
             {
                 c_move = 10000;
@@ -247,7 +235,47 @@ int main()
             {
                 c_conv_speed = 0;
             }
+            if (is_t_conv)
+            {
+                t_conv_speed = 16000;
+            }
+            else
+            {
+                t_conv_speed = 0;
+            }
+            if (is_b_throw)
+            {
+                b_throw_speed = 13000;
+            }
+            else
+            {
+                b_throw_speed = 0;
+            }
+            if (box_status == c_state::UP)
+            {
+                box_catch = 15000;
+            }
+            else if (box_status == c_state::DOWN)
+            {
+                box_catch = -15000;
+            }
+            else
+            {
+                box_catch = 0;
+            }
+            if (is_c_push)
+            {
+                c_push = 8000;
+            }
+            else
+            {
+                c_push = 0;
+            }
 
+            pwm1[0] = t_conv_speed;
+            pwm1[1] = b_throw_speed;
+            pwm1[2] = box_catch
+            pwm1[3] = c_push;
             pwm2[0] = c_rotate;
             pwm2[1] = b_rotate;
             pwm2[2] = c_move;

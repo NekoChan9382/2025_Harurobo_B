@@ -25,7 +25,7 @@ enum class c_state
 
 int main()
 {
-    DigitalIn ryugu(PA_6);
+    DigitalOut ryugu(PA_6);
     CAN can1(PA_11, PA_12, (int)1e6);
     int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列

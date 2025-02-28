@@ -39,14 +39,9 @@ int main()
     constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
     constexpr int motor_amount = 4;
-    int velocity_xy[2] = {0}; // x, y, ang
-    float velocity_ang = 0;
+
     int pos_mm[3] = {0}; // x, y, ang
     int motor_velocity[motor_amount] = {0};
-    constexpr int wheel_radius = 50; // mm
-    constexpr int robot_size = 300;  // mm
-    constexpr int max_dps_trans = 20000;
-    constexpr int max_dps_rot = 500;
 
     bool is_c_indoroll = false;
     bool is_b_indoroll = false;
@@ -60,7 +55,6 @@ int main()
     int t_conv_speed = 0;
     int b_throw_speed = 0;
     int box_catch = 0;
-    constexpr bool is_calc = false;
 
     bool is_t_conv = false;
     auto box_status = c_state::STOP;
@@ -69,6 +63,8 @@ int main()
     int box_output = 0;
     int cone_out_output = 0;
 
+    CAN can(PA_11, PA_12, 1000000);
+    CANMessage msg_encoder;
     BufferedSerial pc(USBTX, USBRX, 115200);
     // BufferedSerial controller(PA_9, PA_10, 115200);
     dji::C620 c620(PB_12, PB_13);
@@ -96,32 +92,19 @@ int main()
             c620.read_data();
         }
 
+        if (can.read(msg_encoder); msg_encoder.id == 10)
+        {
+            int16_t encoder_data[motor_amount] = {0};
+            for (int i = 0; i < motor_amount; i++)
+            {
+                encoder_data[i] = msg_encoder.data[2 * i + 1] << 8 | msg_encoder.data[2 * i];
+            }
+            printf("enc_data,%d,%d,%d,%d\n", encoder_data[0], encoder_data[1], encoder_data[2], encoder_data[3]);
+        }
+
         char data[10] = "";
         if (readline(pc, data) == 0)
         {
-            // printf("%s\n", data);
-
-            if (strcmp(data, "trans") == 0)
-            {
-                // printf("trans!!\n");
-                for (int i = 0; i < 2; i++)
-                {
-                    char data_trans[10] = "";
-                    if (readline(pc, data_trans, false, true) == 0)
-                    {
-                        velocity_xy[i] = atof(data_trans) * max_dps_trans * -1;
-                    }
-                }
-            }
-            if (strcmp(data, "rot") == 0)
-            {
-                char data_rot[10] = "";
-                if (readline(pc, data_rot, false, true) == 0)
-                {
-                    velocity_ang = atof(data_rot) * max_dps_rot * -1;
-                    // printf("velocity_ang: %f\n", velocity_ang);
-                }
-            }
             if (strcmp(data, "vel") == 0)
             {
                 for (int i = 0; i < motor_amount; i++)
@@ -267,47 +250,26 @@ int main()
             pwm2[0] = 0;
             pwm2[1] = c_move;
             pwm2[2] = box_catch;
-            pwm2[3] = c_conv_speed
+            pwm2[3] = c_conv_speed;
         }
         if (now - pre > 10ms)
         {
             float elapsed = duration_to_sec(now - pre);
-            // printf("encoder_diff: %d, %d, %d, %d\n", encoder_diff[0], encoder_diff[1], encoder_diff[2], encoder_diff[3]);
+            // printf("encoder_data: %d, %d, %d, %d\n", encoder_data[0], encoder_data[1], encoder_data[2], encoder_data[3]);
 
             int16_t motor_output[motor_amount] = {0};
-            if (is_calc)
-            {
-                float theta_rad = atan2(velocity_xy[1], velocity_xy[0]);
-                float output_power = hypot(velocity_xy[0], velocity_xy[1]);
-                // printf("output_power: %f\n", output_power);
-                for (int i = 0; i < motor_amount; i++)
-                {
-                    float rmp_to_rad = 2 * M_PI / 60;
-                    float motor_dps = c620.get_rpm(i + 1) * rmp_to_rad;
-                    float motor_ang = i * M_PI / 2;
-                    float motor_offset = M_PI / 4;
-                    float goal_ang_vel = (sin(theta_rad - (motor_ang + motor_offset)) * output_power + velocity_ang * robot_size) / wheel_radius;
-                    // printf("goal_ang_vel %d: %f, dps: %f\n", i, goal_ang_vel, motor_dps);
-                    const float out = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
-                    printf("out: %f\n", out);
-                    c620.set_output_percent(out, i + 1);
-                    // c620.set_output(0, i+1);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < motor_amount; i++)
-                {
-                    float rmp_to_rad = 2 * M_PI / 60;
-                    float motor_dps = c620.get_rpm(i + 1) * rmp_to_rad;
-                    int goal_ang_vel = motor_velocity[i];
-                    const float percent = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
-                    const int out = percent * dji_max_output;
-                    printf("dps: %f, goal: %d, out: %d\n", motor_dps, goal_ang_vel, out);
 
-                    c620.set_output(out, i + 1);
-                }
+            for (int i = 0; i < motor_amount; i++)
+            {
+                float rmp_to_rad = 2 * M_PI / 60;
+                float motor_dps = c620.get_rpm(i + 1) * rmp_to_rad;
+                int goal_ang_vel = motor_velocity[i];
+                const float percent = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
+                // printf("dps: %f, goal: %d, out: %d\n", motor_dps, goal_ang_vel, out);
+
+                c620.set_output_percent(percent, i + 1);
             }
+
             for (int i = 0; i < motor_amount; i++)
             {
                 motor_output[i] = c620.get_current(i + 1);

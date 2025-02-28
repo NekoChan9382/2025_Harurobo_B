@@ -46,7 +46,6 @@ int main()
     bool is_b_indoroll = false;
     bool c_move_belt = false;
     bool is_b_throw = false;
-    bool is_c_push = false;
     auto c_direction = c_state::STOP;
     int c_move = 0;
     int c_rotate = 0;
@@ -55,7 +54,6 @@ int main()
     int t_conv_speed = 0;
     int b_throw_speed = 0;
     int box_catch = 0;
-    int c_push = 0;
     constexpr bool is_calc = false;
 
     bool is_t_conv = false;
@@ -163,14 +161,6 @@ int main()
             {
                 box_status = c_state::STOP;
             }
-            if (strcmp(data, "c_push") == 0)
-            {
-                is_c_push = true;
-            }
-            else if (strcmp(data, "c_push_s") == 0)
-            {
-                is_c_push = false;
-            }
 
             if (strcmp(data, "c_indo") == 0)
             {
@@ -263,23 +253,15 @@ int main()
             {
                 box_catch = 0;
             }
-            if (is_c_push)
-            {
-                c_push = 8000;
-            }
-            else
-            {
-                c_push = 0;
-            }
 
-            pwm1[0] = t_conv_speed;
-            pwm1[1] = b_throw_speed;
-            pwm1[2] = box_catch
-            pwm1[3] = c_push;
-            pwm2[0] = c_rotate;
-            pwm2[1] = b_rotate;
-            pwm2[2] = c_move;
-            pwm2[3] = c_conv_speed;
+            pwm1[0] = b_throw_speed;
+            pwm1[1] = b_rotate;
+            pwm1[2] = t_conv_speed;
+            pwm1[3] = c_rotate;
+            pwm2[0] = 0;
+            pwm2[1] = c_move;
+            pwm2[2] = box_catch;
+            pwm2[3] = c_conv_speed
         }
         if (now - pre > 10ms)
         {

@@ -44,21 +44,20 @@ int main()
     int pos_mm[3] = {0}; // x, y, ang
     int motor_velocity[motor_amount] = {0};
 
-    bool is_c_indoroll = false;
-    bool is_b_indoroll = false;
-    bool c_move_belt = false;
-    bool is_b_throw = false;
-    auto c_direction = c_state::STOP;
-    int c_move = 0;
-    int c_rotate = 0;
-    int b_rotate = 0;
-    int c_conv_speed = 0;
-    int t_conv_speed = 0;
-    int b_throw_speed = 0;
-    int box_catch = 0;
-
-    bool is_t_conv = false;
-    auto box_status = c_state::STOP;
+    bool is_corn_indo_rolling = false;
+    bool is_ball_indo_rolling = false;
+    bool is_corn_conveyor_moving = false;
+    bool is_ball_throwing = false;
+    bool is_ball_conveyor_moving = false;
+    auto corn_indo_updown = c_state::STOP;
+    auto basket_updown = c_state::STOP;
+    int corn_indo_updown_speed = 0;
+    int corn_indo_roll_speed = 0;
+    int ball_indo_roll_speed = 0;
+    int corn_conveyor_speed = 0;
+    int ball_conveyor_speed = 0;
+    int ball_throw_speed = 0;
+    int basket_updown_speed = 0;
 
     CAN can(PA_11, PA_12, 1000000);
     CANMessage msg_encoder;
@@ -125,51 +124,51 @@ int main()
             }
             if (strcmp(data, "b_conv") == 0)
             {
-                is_t_conv = !is_t_conv;
+                is_ball_conveyor_moving = !is_ball_conveyor_moving;
             }
 
             if (strcmp(data, "b_launch") == 0)
             {
-                is_b_throw = true
+                is_ball_throwing = true;
             }
             else if (strcmp(data, "b_launch_s") == 0)
             {
-                is_b_throw = false;
+                is_ball_throwing = false;
             }
             if (strcmp(data, "k_up") == 0)
             {
-                box_status = c_state::UP;
+                basket_updown = c_state::UP;
             }
             else if (strcmp(data, "k_down") == 0)
             {
-                box_status = c_state::DOWN;
+                basket_updown = c_state::DOWN;
             }
             else if (strcmp(data, "k_stop") == 0)
             {
-                box_status = c_state::STOP;
+                basket_updown = c_state::STOP;
             }
 
             if (strcmp(data, "c_indo") == 0)
             {
                 //    printf("Pushed Circle\n");
-                is_c_indoroll = !is_c_indoroll;
+                is_corn_indo_rolling = !is_corn_indo_rolling;
             }
             if (strcmp(data, "b_indo") == 0)
             {
                 //    printf("Pushed Square\n");
-                is_b_indoroll = !is_b_indoroll;
+                is_ball_indo_rolling = !is_ball_indo_rolling;
             }
             if (strcmp(data, "c_up") == 0)
             {
-                c_direction = c_state::UP;
+                corn_indo_updown = c_state::UP;
             }
             if (strcmp(data, "c_down") == 0)
             {
-                c_direction = c_state::DOWN;
+                corn_indo_updown = c_state::DOWN;
             }
             if (strcmp(data, "c_stop") == 0)
             {
-                c_direction = c_state::STOP;
+                corn_indo_updown = c_state::STOP;
             }
             if (strcmp(data, "c_push") == 0) //TODO: neo_pushに変更s
             {
@@ -177,82 +176,82 @@ int main()
             }
 
 
-            if (c_direction == c_state::UP)
+            if (corn_indo_updown == c_state::UP)
             {
-                c_move = 10000;
+                corn_indo_updown_speed = 10000;
             }
-            else if (c_direction == c_state::DOWN)
+            else if (corn_indo_updown == c_state::DOWN)
             {
-                c_move = -10000;
+                corn_indo_updown_speed = -10000;
             }
             else
             {
-                c_move = 0;
+                corn_indo_updown_speed = 0;
             }
 
-            if (is_c_indoroll)
+            if (is_corn_indo_rolling)
             {
-                c_rotate = 8000;
+                corn_indo_roll_speed = 8000;
             }
             else
             {
-                c_rotate = 0;
+                corn_indo_roll_speed = 0;
             }
 
-            if (is_b_indoroll)
+            if (is_ball_indo_rolling)
             {
-                b_rotate = 8000;
+                ball_indo_roll_speed = 8000;
             }
             else
             {
-                b_rotate = 0;
+                ball_indo_roll_speed = 0;
             }
 
-            if (c_move_belt)
+            if (is_corn_conveyor_moving)
             {
-                c_conv_speed = 10000;
+                corn_conveyor_speed = 10000;
             }
             else
             {
-                c_conv_speed = 0;
+                corn_conveyor_speed = 0;
             }
-            if (is_t_conv)
+            if (is_ball_conveyor_moving)
             {
-                t_conv_speed = 16000;
-            }
-            else
-            {
-                t_conv_speed = 0;
-            }
-            if (is_b_throw)
-            {
-                b_throw_speed = 13000;
+                ball_conveyor_speed = 16000;
             }
             else
             {
-                b_throw_speed = 0;
+                ball_conveyor_speed = 0;
             }
-            if (box_status == c_state::UP)
+            if (is_ball_throwing)
             {
-                box_catch = 15000;
-            }
-            else if (box_status == c_state::DOWN)
-            {
-                box_catch = -15000;
+                ball_throw_speed = 13000;
             }
             else
             {
-                box_catch = 0;
+                ball_throw_speed = 0;
+            }
+            if (basket_updown == c_state::UP)
+            {
+                basket_updown_speed = 15000;
+            }
+            else if (basket_updown == c_state::DOWN)
+            {
+                basket_updown_speed = -15000;
+            }
+            else
+            {
+                basket_updown_speed = 0;
             }
 
-            pwm1[0] = b_throw_speed;
-            pwm1[1] = b_rotate;
-            pwm1[2] = t_conv_speed;
-            pwm1[3] = c_rotate;
-            pwm2[0] = 0;
-            pwm2[1] = c_move;
-            pwm2[2] = box_catch;
-            pwm2[3] = c_conv_speed;
+            pwm1[0] = corn_indo_roll_speed;
+            pwm1[1] = corn_indo_updown_speed;
+            pwm1[2] = basket_updown_speed;
+            pwm1[3] = corn_conveyor_speed;
+            pwm2[0] = ball_throw_speed;
+            pwm2[1] = corn_indo_updown_speed;
+            pwm2[2] = ball_indo_roll_speed;
+            pwm2[3] = ball_conveyor_speed;
         }
         if (now - pre > 10ms)
         {

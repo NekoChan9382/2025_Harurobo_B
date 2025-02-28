@@ -149,11 +149,11 @@ int main()
 
             if (strcmp(data, "b_launch") == 0)
             {
-                is_b_throw = !is_b_throw;
+                is_b_throw = true
             }
             else if (strcmp(data, "b_launch_s") == 0)
             {
-                pwm1[1] = 0;
+                is_b_throw = false;
             }
             if (strcmp(data, "k_up") == 0)
             {

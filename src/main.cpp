@@ -25,6 +25,7 @@ enum class c_state
 
 int main()
 {
+    DigitalIn ryugu(PA_6);
     CAN can1(PA_11, PA_12, (int)1e6);
     int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
@@ -81,6 +82,7 @@ int main()
     }
 
     c620.set_max_output(dji_max_output);
+    ryugu = 0;
 
     while (true)
     {
@@ -172,6 +174,10 @@ int main()
             if (strcmp(data, "c_stop") == 0)
             {
                 c_direction = c_state::STOP;
+            }
+            if (strcmp(data, "c_push") == 0) //TODO: neo_pushに変更s
+            {
+                ryugu = !ryugu;
             }
 
 

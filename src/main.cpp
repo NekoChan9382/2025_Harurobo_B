@@ -29,12 +29,12 @@ int main()
     CAN can1(PA_11, PA_12, (int)1e6);
     int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
-    int8_t servo1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    uint8_t servo1[8] = {0, 255, 0, 0, 0, 0, 0, 0};
     CANMessage msg1;
     CANMessage msg2;
     CANMessage msg_servo;
-    constexpr int CAN_ID1 = 2; // 後で変える
-    constexpr int CAN_ID2 = 3;
+    constexpr int CAN_ID1 = 1; // 後で変える
+    constexpr int CAN_ID2 = 2;
     constexpr int CAN_ID_SERVO = 141;
 
     constexpr int pid_max = 1;
@@ -64,6 +64,7 @@ int main()
     BufferedSerial pc(USBTX, USBRX, 115200);
     // BufferedSerial controller(PA_9, PA_10, 115200);
     dji::C620 c620(PB_12, PB_13);
+    DigitalOut led(LED1);
 
     PidGain pid_gain = {0.001, 0.00001, 0.0};
     std::array<Pid, motor_amount> pid = {Pid({pid_gain, -pid_max, pid_max}),
@@ -81,6 +82,7 @@ int main()
 
     while (true)
     {
+        led=0;
         auto now = HighResClock::now();
         static auto pre = now;
 
@@ -122,17 +124,34 @@ int main()
             {
                 servo1[0] = 144;
             }
+            if (strcmp(data, "b_contain") == 0)
+            {
+                if (servo1[1] == 0)
+                {
+                    servo1[1] = 255;
+                }
+                else
+                {
+                    servo1[1] = 0;
+                }
+            }
             if (strcmp(data, "b_conv") == 0)
             {
                 is_ball_conveyor_moving = !is_ball_conveyor_moving;
             }
+            if (strcmp(data, "c_conv") == 0)
+            {
+                is_corn_conveyor_moving = !is_corn_conveyor_moving;
+            }
 
             if (strcmp(data, "b_launch") == 0)
             {
+                led=1;
                 is_ball_throwing = true;
             }
-            else if (strcmp(data, "b_launch_s") == 0)
+            if (strcmp(data, "b_launch_s") == 0)
             {
+                led=0;
                 is_ball_throwing = false;
             }
             if (strcmp(data, "k_up") == 0)
@@ -244,14 +263,14 @@ int main()
                 basket_updown_speed = 0;
             }
 
-            pwm1[0] = corn_indo_updown_speed;
-            pwm1[1] = 0; //空き
-            pwm1[2] = basket_updown_speed;
-            pwm1[3] = corn_conveyor_speed;
-            pwm2[0] = ball_conveyor_speed;
-            pwm2[1] = ball_indo_roll_speed;
-            pwm2[2] = ball_throw_speed;
-            pwm2[3] = corn_indo_roll_speed;
+            pwm1[0] = ball_conveyor_speed;
+            pwm1[1] = ball_indo_roll_speed;
+            pwm1[2] = ball_throw_speed;
+            pwm1[3] = corn_indo_roll_speed;
+            pwm2[0] = corn_indo_updown_speed;
+            pwm2[1] = 0;
+            pwm2[2] = basket_updown_speed;
+            pwm2[3] = corn_conveyor_speed;
         
         }
         if (now - pre > 10ms)
@@ -276,7 +295,7 @@ int main()
             {
                 motor_output[i] = c620.get_current(i + 1);
             }
-            printf("motor_output: %d, %d, %d, %d\n", motor_output[0], motor_output[1], motor_output[2], motor_output[3]);
+            // printf("motor_output: %d, %d, %d, %d\n", motor_output[0], motor_output[1], motor_output[2], motor_output[3]);
             // printf("motor_dps: %d, %d, %d, %d\n", motor_dps[0], motor_dps[1], motor_dps[2], motor_dps[3]);
             c620.write();
             

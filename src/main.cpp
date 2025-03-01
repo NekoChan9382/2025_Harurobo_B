@@ -118,11 +118,11 @@ int main()
 
             if (strcmp(data, "sort_t") == 0)
             {
-                servo1[0] = 112;
+                servo1[0] = 116;
             }
             else if (strcmp(data, "sort_s") == 0)
             {
-                servo1[0] = 144;
+                servo1[0] = 170;
             }
             if (strcmp(data, "b_contain") == 0)
             {
@@ -210,7 +210,7 @@ int main()
 
             if (is_corn_indo_rolling)
             {
-                corn_indo_roll_speed = 8000;
+                corn_indo_roll_speed = -8000;
             }
             else
             {
@@ -219,7 +219,7 @@ int main()
 
             if (is_ball_indo_rolling)
             {
-                ball_indo_roll_speed = 8000;
+                ball_indo_roll_speed = -8000;
             }
             else
             {
@@ -236,7 +236,7 @@ int main()
             }
             if (is_ball_conveyor_moving)
             {
-                ball_conveyor_speed = 16000;
+                ball_conveyor_speed = -16000;
             }
             else
             {

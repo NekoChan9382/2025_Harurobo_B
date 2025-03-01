@@ -101,7 +101,7 @@ int main()
             printf("enc_data,%d,%d,%d,%d\n", encoder_data[0], encoder_data[1], encoder_data[2], encoder_data[3]);
         }
 
-        char data[10] = "";
+        char data[15] = "";
         if (readline(pc, data) == 0)
         {
             if (strcmp(data, "vel") == 0)
@@ -210,7 +210,7 @@ int main()
 
             if (is_corn_indo_rolling)
             {
-                corn_indo_roll_speed = -8000;
+                corn_indo_roll_speed = -15000;
             }
             else
             {
@@ -268,8 +268,8 @@ int main()
             pwm1[2] = ball_throw_speed;
             pwm1[3] = corn_indo_roll_speed;
             pwm2[0] = corn_indo_updown_speed;
-            pwm2[1] = 0;
-            pwm2[2] = basket_updown_speed;
+            pwm2[1] = basket_updown_speed;
+            pwm2[2] = 0;
             pwm2[3] = corn_conveyor_speed;
         
         }
@@ -320,7 +320,7 @@ bool readline(BufferedSerial &serial, char *buffer, const bool is_integar, const
         return 1;
     }
 
-    while ((buff != '\n') and i < 10)
+    while ((buff != '\n') and i < 15)
     {
         serial.read(&buff, sizeof(buff)); // シリアル受信
         // printf("%c", buff);

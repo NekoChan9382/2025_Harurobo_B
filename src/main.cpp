@@ -244,14 +244,15 @@ int main()
                 basket_updown_speed = 0;
             }
 
-            pwm1[0] = corn_indo_roll_speed;
-            pwm1[1] = corn_indo_updown_speed;
+            pwm1[0] = corn_indo_updown_speed;
+            pwm1[1] = 0; //空き
             pwm1[2] = basket_updown_speed;
             pwm1[3] = corn_conveyor_speed;
-            pwm2[0] = ball_throw_speed;
-            pwm2[1] = corn_indo_updown_speed;
-            pwm2[2] = ball_indo_roll_speed;
-            pwm2[3] = ball_conveyor_speed;
+            pwm2[0] = ball_conveyor_speed;
+            pwm2[1] = ball_indo_roll_speed;
+            pwm2[2] = ball_throw_speed;
+            pwm2[3] = corn_indo_roll_speed;
+        
         }
         if (now - pre > 10ms)
         {

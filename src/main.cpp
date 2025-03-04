@@ -25,11 +25,12 @@ enum class c_state
 
 int main()
 {
+    printf("reset\n");
     DigitalOut ryugu(PA_6);
     CAN can1(PA_11, PA_12, (int)1e6);
     int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
-    uint8_t servo1[8] = {0, 255, 0, 0, 0, 0, 0, 0};
+    uint8_t servo1[8] = {0, 255, 170, 100, 0, 0, 0, 0};
     CANMessage msg1;
     CANMessage msg2;
     CANMessage msg_servo;
@@ -66,7 +67,7 @@ int main()
     dji::C620 c620(PB_12, PB_13);
     DigitalOut led(LED1);
 
-    PidGain pid_gain = {0.001, 0.00001, 0.0};
+    PidGain pid_gain = {0.001, 0.00001, 0.0}; //0.0002, 0.0001, 0
     std::array<Pid, motor_amount> pid = {Pid({pid_gain, -pid_max, pid_max}),
                                          Pid({pid_gain, -pid_max, pid_max}),
                                          Pid({pid_gain, -pid_max, pid_max}),
@@ -79,6 +80,7 @@ int main()
 
     c620.set_max_output(dji_max_output);
     ryugu = 0;
+    printf("reset\n");
 
     while (true)
     {
@@ -109,7 +111,7 @@ int main()
                 for (int i = 0; i < motor_amount; i++)
                 {
                     char data_vel[10] = "";
-                    if (readline(pc, data_vel, false, true) == 0)
+                    if (readline(pc, data_vel, true, false) == 0)
                     {
                         motor_velocity[i] = atoi(data_vel) * 19 * -1;
                     }
@@ -118,11 +120,11 @@ int main()
 
             if (strcmp(data, "sort_t") == 0)
             {
-                servo1[0] = 116;
+                servo1[3] = 112;
             }
             else if (strcmp(data, "sort_s") == 0)
             {
-                servo1[0] = 170;
+                servo1[3] = 87;
             }
             if (strcmp(data, "b_contain") == 0)
             {
@@ -133,6 +135,17 @@ int main()
                 else
                 {
                     servo1[1] = 0;
+                }
+            }
+            if (strcmp(data, "c_push") == 0)
+            {
+                if (servo1[2] == 0)
+                {
+                    servo1[2] = 170;
+                }
+                else
+                {
+                    servo1[2] = 0;
                 }
             }
             if (strcmp(data, "b_conv") == 0)
@@ -189,7 +202,7 @@ int main()
             {
                 corn_indo_updown = c_state::STOP;
             }
-            if (strcmp(data, "c_push") == 0) //TODO: neo_pushに変更s
+            if (strcmp(data, "noe_push") == 0) //TODO: neo_pushに変更s
             {
                 ryugu = !ryugu;
             }
@@ -197,11 +210,11 @@ int main()
 
             if (corn_indo_updown == c_state::UP)
             {
-                corn_indo_updown_speed = 10000;
+                corn_indo_updown_speed = 6000;
             }
             else if (corn_indo_updown == c_state::DOWN)
             {
-                corn_indo_updown_speed = -10000;
+                corn_indo_updown_speed = -6000;
             }
             else
             {
@@ -210,7 +223,7 @@ int main()
 
             if (is_corn_indo_rolling)
             {
-                corn_indo_roll_speed = -15000;
+                corn_indo_roll_speed = -18000;
             }
             else
             {
@@ -228,7 +241,7 @@ int main()
 
             if (is_corn_conveyor_moving)
             {
-                corn_conveyor_speed = 10000;
+                corn_conveyor_speed = 13000;
             }
             else
             {
@@ -279,6 +292,8 @@ int main()
             // printf("encoder_data: %d, %d, %d, %d\n", encoder_data[0], encoder_data[1], encoder_data[2], encoder_data[3]);
 
             int16_t motor_output[motor_amount] = {0};
+            int motor_dpsa[motor_amount] = {0};
+            int motor_goal[motor_amount] = {0};
 
             for (int i = 0; i < motor_amount; i++)
             {
@@ -289,14 +304,17 @@ int main()
                 // printf("dps: %f, goal: %d, out: %d\n", motor_dps, goal_ang_vel, out);
 
                 c620.set_output_percent(percent, i + 1);
+                motor_dpsa[i] = motor_dps * 180 / M_PI;
+                motor_goal[i] = goal_ang_vel;
             }
 
             for (int i = 0; i < motor_amount; i++)
             {
                 motor_output[i] = c620.get_current(i + 1);
             }
-            // printf("motor_output: %d, %d, %d, %d\n", motor_output[0], motor_output[1], motor_output[2], motor_output[3]);
-            // printf("motor_dps: %d, %d, %d, %d\n", motor_dps[0], motor_dps[1], motor_dps[2], motor_dps[3]);
+            printf("m_ou,%d,%d,%d,%d\n", motor_output[0], motor_output[1], motor_output[2], motor_output[3]);
+            printf("m_vel,%d,%d,%d,%d\n", motor_dpsa[0], motor_dpsa[1], motor_dpsa[2], motor_dpsa[3]);
+            printf("m_goal,%d,%d,%d,%d\n", motor_goal[0], motor_goal[1], motor_goal[2], motor_goal[3]);
             c620.write();
             
             CANMessage msg1(CAN_ID1, (const uint8_t *)&pwm1, 8);

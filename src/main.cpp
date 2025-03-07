@@ -27,6 +27,8 @@ int main()
 {
     printf("reset\n");
     DigitalOut ryugu(PA_6);
+    DigitalOut emergency_to_arduio(PA_7);
+    DigitalIn emergency_button(PB_6, PullUp);
     CAN can1(PA_11, PA_12, (int)1e6);
     int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
@@ -36,7 +38,7 @@ int main()
     CANMessage msg_servo;
     constexpr int CAN_ID1 = 1; // 後で変える
     constexpr int CAN_ID2 = 2;
-    constexpr int CAN_ID_SERVO = 141;
+    constexpr int CAN_ID_SERVO = 149;
 
     constexpr int pid_max = 1;
     constexpr int dji_max_output = 8000;
@@ -80,6 +82,7 @@ int main()
 
     c620.set_max_output(dji_max_output);
     ryugu = 0;
+    emergency_to_arduio = 0;
     printf("reset\n");
 
     while (true)
@@ -87,6 +90,15 @@ int main()
         led=0;
         auto now = HighResClock::now();
         static auto pre = now;
+        bool is_emergency_unlocked = emergency_button.read();
+        if (is_emergency_unlocked)
+        {
+            emergency_to_arduio = 1;
+        }
+        else
+        {
+            emergency_to_arduio = 0;
+        }
 
         for (int i = 0; i < motor_amount; i++)
         {
@@ -139,13 +151,13 @@ int main()
             }
             if (strcmp(data, "c_push") == 0)
             {
-                if (servo1[2] == 0)
+                if (servo1[5] == 0)
                 {
-                    servo1[2] = 170;
+                    servo1[5] = 170;
                 }
                 else
                 {
-                    servo1[2] = 0;
+                    servo1[5] = 0;
                 }
             }
             if (strcmp(data, "b_conv") == 0)
@@ -202,7 +214,7 @@ int main()
             {
                 corn_indo_updown = c_state::STOP;
             }
-            if (strcmp(data, "noe_push") == 0) //TODO: neo_pushに変更s
+            if (strcmp(data, "neo_push") == 0) //TODO: neo_pushに変更s
             {
                 ryugu = !ryugu;
             }
@@ -223,7 +235,7 @@ int main()
 
             if (is_corn_indo_rolling)
             {
-                corn_indo_roll_speed = -18000;
+                corn_indo_roll_speed = -21000;
             }
             else
             {

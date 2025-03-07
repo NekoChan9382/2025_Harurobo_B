@@ -91,7 +91,7 @@ int main()
         auto now = HighResClock::now();
         static auto pre = now;
         bool is_emergency_unlocked = emergency_button.read();
-        if (is_emergency_unlocked)
+        if (is_emergency_unlocked == 0)
         {
             emergency_to_arduio = 1;
         }
@@ -286,6 +286,17 @@ int main()
             else
             {
                 basket_updown_speed = 0;
+            }
+            if (strcmp(data, "ping") == 0)
+            {
+                if (is_emergency_unlocked)
+                {
+                    printf("pong,eb_unlock\n");
+                }
+                else
+                {
+                    printf("pong,eb_lock\n");
+                }
             }
 
             pwm1[0] = ball_conveyor_speed;

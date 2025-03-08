@@ -11,6 +11,7 @@
 #include <cmath>
 #include <array>
 #include <C620.hpp>
+#include <Servo.hpp>
 
 
 bool readline(BufferedSerial &serial, char *buffer, bool is_integar = false, bool is_float = false);
@@ -32,7 +33,7 @@ int main()
     CAN can1(PA_11, PA_12, (int)1e6);
     int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
-    uint8_t servo1[8] = {0, 255, 170, 100, 0, 0, 0, 0};
+    // uint8_t servo1[8] = {0, 255, 170, 100, 0, 0, 0, 0};
     CANMessage msg1;
     CANMessage msg2;
     CANMessage msg_servo;
@@ -61,6 +62,8 @@ int main()
     int ball_conveyor_speed = 0;
     int ball_throw_speed = 0;
     int basket_updown_speed = 0;
+    int servo_corn_deg = 0;
+    int servo_seesaw_deg = 0;
 
     CAN can(PA_11, PA_12, 1000000);
     CANMessage msg_encoder;
@@ -68,6 +71,8 @@ int main()
     // BufferedSerial controller(PA_9, PA_10, 115200);
     dji::C620 c620(PB_12, PB_13);
     DigitalOut led(LED1);
+    Servo servo_corn_contain(PC_6, 270, 2500us, 500us, 60);
+    Servo servo_seesaw(PC_7, 180, 2500us, 500us, 60);
 
     PidGain pid_gain = {0.001, 0.00001, 0.0}; //0.0002, 0.0001, 0
     std::array<Pid, motor_amount> pid = {Pid({pid_gain, -pid_max, pid_max}),
@@ -132,32 +137,21 @@ int main()
 
             if (strcmp(data, "sort_t") == 0)
             {
-                servo1[3] = 112;
+                servo_seesaw_deg = 112;
             }
             else if (strcmp(data, "sort_s") == 0)
             {
-                servo1[3] = 87;
-            }
-            if (strcmp(data, "b_contain") == 0)
-            {
-                if (servo1[1] == 0)
-                {
-                    servo1[1] = 255;
-                }
-                else
-                {
-                    servo1[1] = 0;
-                }
+                servo_seesaw_deg = 87;
             }
             if (strcmp(data, "c_push") == 0)
             {
-                if (servo1[5] == 0)
+                if (servo_corn_deg == 0)
                 {
-                    servo1[5] = 170;
+                    servo_corn_deg = 180;
                 }
                 else
                 {
-                    servo1[5] = 0;
+                    servo_corn_deg = 0;
                 }
             }
             if (strcmp(data, "b_conv") == 0)
@@ -358,6 +352,8 @@ int main()
             can1.write(msg1);
             can1.write(msg2);
             can1.write(msg_servo);
+            servo_corn_contain.move(servo_corn_deg);
+            servo_seesaw.move(servo_seesaw_deg);
 
             pre = now;
         }

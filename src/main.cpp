@@ -45,6 +45,9 @@ int main()
     constexpr int dji_max_output = 8000;
     constexpr int motor_amount = 4;
 
+    bool ag_fix = false;
+    float fixed_angle = 0;
+
     int pos_mm[3] = {0}; // x, y, ang
     int motor_velocity[motor_amount] = {0};
 
@@ -80,10 +83,14 @@ int main()
                                          Pid({pid_gain, -pid_max, pid_max}),
                                          Pid({pid_gain, -pid_max, pid_max})};
 
+    PidGain pid_gain_angle = {0.001, 0.00001, 0.0};
+    Pid pid_angle({pid_gain, -pid_max, pid_max});
+
     for (int i = 0; i < motor_amount; i++)
     {
         pid[i].reset();
     }
+    pid_angle.reset();
 
     c620.set_max_output(dji_max_output);
     ryugu = 0;
@@ -127,7 +134,7 @@ int main()
             {
                 for (int i = 0; i < motor_amount; i++)
                 {
-                    char data_vel[10] = "";
+                    char data_vel[15] = "";
                     if (readline(pc, data_vel, true, false) == 0)
                     {
                         motor_velocity[i] = atoi(data_vel) * 19 * -1;
@@ -219,6 +226,30 @@ int main()
             if (strcmp(data, "neo_push") == 0) //TODO: neo_pushに変更s
             {
                 ryugu = !ryugu;
+            }
+            if (strcmp(data, "ag_fix_on") == 0)
+            {
+                ag_fix = true;
+            }
+            if (strcmp(data, "ag_fix_off") == 0)
+            {
+                ag_fix = false;
+                pid_angle.reset();
+            }
+            if (strcmp(data, "ag_fix_val") == 0)
+            {
+                char data_ag[15] = "";
+                
+                if (readline(pc, data_ag, false, true) == 0)
+                {
+                    fixed_angle = atof(data_ag);
+
+                    char data_cur_ag[15] = "";
+                    if (readline(pc, data_cur_ag, false, true) == 0)
+                    {
+                        pos_mm[2] = atof(data_ag);
+                    }
+                }
             }
 
 
@@ -323,6 +354,12 @@ int main()
             int16_t motor_output[motor_amount] = {0};
             int motor_dpsa[motor_amount] = {0};
             int motor_goal[motor_amount] = {0};
+            float motor_percent_modify = 0;
+
+            if (ag_fix)
+            {
+                motor_percent_modify = pid_angle.calc(fixed_angle, pos_mm[2], elapsed);
+            }
 
             for (int i = 0; i < motor_amount; i++)
             {
@@ -332,7 +369,7 @@ int main()
                 const float percent = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
                 // printf("dps: %f, goal: %d, out: %d\n", motor_dps, goal_ang_vel, out);
 
-                c620.set_output_percent(percent, i + 1);
+                c620.set_output_percent(percent + motor_percent_modify, i + 1);
                 motor_dpsa[i] = motor_dps * 180 / M_PI;
                 motor_goal[i] = goal_ang_vel;
             }

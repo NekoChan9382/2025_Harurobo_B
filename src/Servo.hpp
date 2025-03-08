@@ -9,7 +9,7 @@ class Servo
         Servo(const PinName& pin, const int max_deg, const std::chrono::microseconds max_pulse, const std::chrono::microseconds min_pulse, const int freq) : 
                     servo(pin), max_pulse_width(max), min_pulse_width(min), default_pulse_width((max_pulse_width + min_pulse_width) / 2), max_deg(max_deg)
         {
-            servo.period_ms(1000 / freq);
+            servo.period_us(1'000'000 / freq);
             servo.pulsewidth_us(default_pulse_width.count());
         }
         move(const unsigned int deg)

@@ -49,7 +49,7 @@ int main()
 
     bool is_corn_indo_rolling = false;
     bool is_ball_indo_rolling = false;
-    bool is_corn_conveyor_moving = false;
+    auto corn_conveyor_updown = c_state::STOP;
     bool is_ball_throwing = false;
     bool is_ball_conveyor_moving = false;
     auto corn_indo_updown = c_state::STOP;
@@ -164,9 +164,17 @@ int main()
             {
                 is_ball_conveyor_moving = !is_ball_conveyor_moving;
             }
-            if (strcmp(data, "c_conv") == 0)
+            if (strcmp(data, "c_conv_up") == 0)
             {
-                is_corn_conveyor_moving = !is_corn_conveyor_moving;
+                corn_conveyor_updown = c_state::UP;
+            }
+            else if (strcmp(data, "c_conv_down") == 0)
+            {
+                corn_conveyor_updown = c_state::DOWN;
+            }
+            else if (strcmp(data, "c_conv_stop") == 0)
+            {
+                corn_conveyor_updown = c_state::STOP;
             }
 
             if (strcmp(data, "b_launch") == 0)
@@ -251,9 +259,13 @@ int main()
                 ball_indo_roll_speed = 0;
             }
 
-            if (is_corn_conveyor_moving)
+            if (corn_conveyor_updown == c_state::UP)
             {
                 corn_conveyor_speed = 13000;
+            }
+            else if (corn_conveyor_updown == c_state::DOWN)
+            {
+                corn_conveyor_speed = -13000;
             }
             else
             {

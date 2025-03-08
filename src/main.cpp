@@ -65,8 +65,8 @@ int main()
     int ball_conveyor_speed = 0;
     int ball_throw_speed = 0;
     int basket_updown_speed = 0;
-    int servo_corn_deg = 0;
-    int servo_seesaw_deg = 0;
+    int servo_corn_deg = 250;
+    int servo_seesaw_deg = 150;
 
     CAN can(PA_11, PA_12, 1000000);
     CANMessage msg_encoder;
@@ -144,21 +144,21 @@ int main()
 
             if (strcmp(data, "sort_t") == 0)
             {
-                servo_seesaw_deg = 112;
+                servo_seesaw_deg = 150;
             }
             else if (strcmp(data, "sort_s") == 0)
             {
-                servo_seesaw_deg = 87;
+                servo_seesaw_deg = 120;
             }
             if (strcmp(data, "c_push") == 0)
             {
-                if (servo_corn_deg == 0)
+                if (servo_corn_deg == 70)
                 {
-                    servo_corn_deg = 180;
+                    servo_corn_deg = 250;
                 }
                 else
                 {
-                    servo_corn_deg = 0;
+                    servo_corn_deg = 70;
                 }
             }
             if (strcmp(data, "b_conv") == 0)

@@ -29,14 +29,13 @@ int main()
     printf("reset\n");
     DigitalOut ryugu(PA_6);
     DigitalOut emergency_to_arduio(PA_7);
-    DigitalIn emergency_button(PB_6, PullUp);
+    DigitalIn emergency_button(PB_6);
     CAN can1(PA_11, PA_12, (int)1e6);
     int16_t pwm1[4] = {0, 0, 0, 0}; // pwm配列
     int16_t pwm2[4] = {0, 0, 0, 0}; // pwm配列
     // uint8_t servo1[8] = {0, 255, 170, 100, 0, 0, 0, 0};
     CANMessage msg1;
     CANMessage msg2;
-    CANMessage msg_servo;
     constexpr int CAN_ID1 = 1; // 後で変える
     constexpr int CAN_ID2 = 2;
     constexpr int CAN_ID_SERVO = 149;
@@ -47,6 +46,8 @@ int main()
 
     bool ag_fix = false;
     float fixed_angle = 0;
+
+    bool is_emergency_stop = false;
 
     int pos_mm[3] = {0}; // x, y, ang
     int motor_velocity[motor_amount] = {0};
@@ -65,17 +66,24 @@ int main()
     int ball_conveyor_speed = 0;
     int ball_throw_speed = 0;
     int basket_updown_speed = 0;
-    int servo_corn_deg = 250;
-    int servo_seesaw_deg = 150;
+    int servo_corn_deg = 0;
+    int servo_seesaw_deg = 90;
+
+    int throw_pwr = 20000;
+
+    bool is_sw_pushed[5] = {0, 0, 0, 0, 0};
 
     CAN can(PA_11, PA_12, 1000000);
     CANMessage msg_encoder;
+    CANMessage msg_sw;
     BufferedSerial pc(USBTX, USBRX, 115200);
     // BufferedSerial controller(PA_9, PA_10, 115200);
     dji::C620 c620(PB_12, PB_13);
     DigitalOut led(LED1);
     Servo servo_corn_contain(PC_6, 270, 2500us, 500us, 60);
+    Servo servo_corn_contain_sub(PC_8, 270, 2500us, 500us, 60);
     Servo servo_seesaw(PC_7, 180, 2500us, 500us, 60);
+    Servo servo_seesaw_sub(PC_9, 180, 2500us, 500us, 60);
 
     PidGain pid_gain = {0.001, 0.00001, 0.0}; //0.0002, 0.0001, 0
     std::array<Pid, motor_amount> pid = {Pid({pid_gain, -pid_max, pid_max}),
@@ -83,8 +91,8 @@ int main()
                                          Pid({pid_gain, -pid_max, pid_max}),
                                          Pid({pid_gain, -pid_max, pid_max})};
 
-    PidGain pid_gain_angle = {0.001, 0.00001, 0.0};
-    Pid pid_angle({pid_gain, -pid_max, pid_max});
+    PidGain pid_gain_angle = {100.0, 0.0, 0.0};
+    Pid pid_angle({pid_gain_angle, -pid_max, pid_max});
 
     for (int i = 0; i < motor_amount; i++)
     {
@@ -95,15 +103,16 @@ int main()
     c620.set_max_output(dji_max_output);
     ryugu = 0;
     emergency_to_arduio = 0;
+    led = 1;
     printf("reset\n");
 
     while (true)
     {
-        led=0;
         auto now = HighResClock::now();
         static auto pre = now;
+        static auto pre_emergency = now;
         bool is_emergency_unlocked = emergency_button.read();
-        if (is_emergency_unlocked == 0)
+        if (!is_emergency_unlocked)
         {
             emergency_to_arduio = 1;
         }
@@ -116,6 +125,15 @@ int main()
         {
             c620.read_data();
         }
+
+        if(can1.read(msg_sw); msg_sw.id == 9){
+            uint8_t sw = msg_sw.data[5]; //スイッチの値の内容
+            for(int i = 0; i < 5; i++){
+            is_sw_pushed[i] = (sw >> i) & 0x01; 
+            // printf("sw,%d,%d\n", i, is_sw_pushed[i]);
+            //シフトで判別する位を最下位ビットへ移動し、1と論理積を行うことで各位の値を判別する。
+            }
+            }
 
         if (can.read(msg_encoder); msg_encoder.id == 10)
         {
@@ -141,25 +159,48 @@ int main()
                     }
                 }
             }
-
-            if (strcmp(data, "sort_t") == 0)
+            if (strcmp(data, "ping") == 0 && !is_emergency_stop)
             {
-                servo_seesaw_deg = 150;
-            }
-            else if (strcmp(data, "sort_s") == 0)
-            {
-                servo_seesaw_deg = 120;
-            }
-            if (strcmp(data, "c_push") == 0)
-            {
-                if (servo_corn_deg == 70)
+                led = !led;
+                // printf("pong,eb_lock\n");
+                if (!is_emergency_unlocked)
                 {
-                    servo_corn_deg = 250;
+                    printf("pong,eb_unlock\n");
                 }
                 else
                 {
-                    servo_corn_deg = 70;
+                    printf("pong,eb_lock\n");
                 }
+            }
+
+            if (strcmp(data, "sort_t") == 0)
+            {
+                servo_seesaw_deg = 97; //142
+                servo_seesaw.move(servo_seesaw_deg);
+                servo_seesaw_sub.move(servo_seesaw_deg);
+            }
+            else if (strcmp(data, "sort_s") == 0)
+            {
+                servo_seesaw_deg = 80; ///125
+                servo_seesaw.move(servo_seesaw_deg);
+                servo_seesaw_sub.move(servo_seesaw_deg);
+            }
+            if (strcmp(data, "c_push") == 0)
+            {
+                if (servo_corn_deg == 0)
+                {
+                    servo_corn_deg = 180;
+                    // servo_corn_contain.move(servo_corn_deg);
+                    // servo_corn_contain_sub.move(servo_corn_deg);
+                }
+                else
+                {
+                    servo_corn_deg = 0;
+                    // servo_corn_contain.move(servo_corn_deg);
+                    // servo_corn_contain_sub.move(servo_corn_deg);
+                }
+                servo_corn_contain.move(servo_corn_deg);
+                servo_corn_contain_sub.move(servo_corn_deg);
             }
             if (strcmp(data, "b_conv") == 0)
             {
@@ -180,12 +221,10 @@ int main()
 
             if (strcmp(data, "b_launch") == 0)
             {
-                led=1;
                 is_ball_throwing = true;
             }
             if (strcmp(data, "b_launch_s") == 0)
             {
-                led=0;
                 is_ball_throwing = false;
             }
             if (strcmp(data, "k_up") == 0)
@@ -251,15 +290,51 @@ int main()
                     }
                 }
             }
-
+            if (strcmp(data, "em_stop") == 0)
+            {
+                for (int i = 0; i < motor_amount; i++)
+                {
+                    c620.set_output_percent(0, i + 1);
+                    pid[i].reset();
+                }
+                pwm1[0] = 0;
+                pwm1[1] = 0;
+                pwm1[2] = 0;
+                pwm1[3] = 0;
+                pwm2[0] = 0;
+                pwm2[1] = 0;
+                pwm2[2] = 0;
+                pwm2[3] = 0;
+                can1.write(CANMessage(CAN_ID1, (const uint8_t *)&pwm1, 8));
+                can1.write(CANMessage(CAN_ID2, (const uint8_t *)&pwm2, 8));
+                printf("emergency_stop\n");
+                pid_angle.reset();
+                is_emergency_stop = true;
+                pre_emergency = now;
+            }
+            if (strcmp(data, "trig_power"))
+            {
+                if (throw_pwr == 20000)
+                {
+                    throw_pwr = 17000;
+                }
+                else if (throw_pwr == 17000)
+                {
+                    throw_pwr = 15000;
+                }
+                else
+                {
+                    throw_pwr = 20000;
+                }
+            }
 
             if (corn_indo_updown == c_state::UP)
             {
-                corn_indo_updown_speed = 6000;
-            }
-            else if (corn_indo_updown == c_state::DOWN)
-            {
                 corn_indo_updown_speed = -6000;
+            }
+            else if (corn_indo_updown == c_state::DOWN && !is_sw_pushed[4])
+            {
+                corn_indo_updown_speed = 6000;
             }
             else
             {
@@ -298,7 +373,7 @@ int main()
             }
             if (is_ball_conveyor_moving)
             {
-                ball_conveyor_speed = -16000;
+                ball_conveyor_speed = -20000;
             }
             else
             {
@@ -306,7 +381,7 @@ int main()
             }
             if (is_ball_throwing)
             {
-                ball_throw_speed = 13000;
+                ball_throw_speed = 14500;
             }
             else
             {
@@ -324,29 +399,23 @@ int main()
             {
                 basket_updown_speed = 0;
             }
-            if (strcmp(data, "ping") == 0)
-            {
-                if (is_emergency_unlocked)
-                {
-                    printf("pong,eb_unlock\n");
-                }
-                else
-                {
-                    printf("pong,eb_lock\n");
-                }
-            }
 
             pwm1[0] = ball_conveyor_speed;
             pwm1[1] = ball_indo_roll_speed;
             pwm1[2] = ball_throw_speed;
             pwm1[3] = corn_indo_roll_speed;
             pwm2[0] = corn_indo_updown_speed;
-            pwm2[1] = basket_updown_speed;
-            pwm2[2] = 0;
+            pwm2[1] = 0;
+            pwm2[2] = basket_updown_speed;
             pwm2[3] = corn_conveyor_speed;
         
         }
-        if (now - pre > 10ms)
+        if (now - pre_emergency > 3s && is_emergency_stop)
+        {
+            is_emergency_stop = false;
+        }
+
+        if (now - pre > 10ms && !is_emergency_stop)
         {
             float elapsed = duration_to_sec(now - pre);
             // printf("encoder_data: %d, %d, %d, %d\n", encoder_data[0], encoder_data[1], encoder_data[2], encoder_data[3]);
@@ -354,11 +423,15 @@ int main()
             int16_t motor_output[motor_amount] = {0};
             int motor_dpsa[motor_amount] = {0};
             int motor_goal[motor_amount] = {0};
-            float motor_percent_modify = 0;
+            float motor_vel_modify = 0;
 
             if (ag_fix)
             {
-                motor_percent_modify = pid_angle.calc(fixed_angle, pos_mm[2], elapsed);
+                motor_vel_modify = pid_angle.calc(fixed_angle, pos_mm[2], elapsed);
+                for (int i = 0; i < motor_amount; i++)
+                {
+                    motor_velocity[i] += motor_vel_modify * -1;
+                }
             }
 
             for (int i = 0; i < motor_amount; i++)
@@ -369,7 +442,7 @@ int main()
                 const float percent = pid[i].calc(goal_ang_vel, motor_dps, elapsed);
                 // printf("dps: %f, goal: %d, out: %d\n", motor_dps, goal_ang_vel, out);
 
-                c620.set_output_percent(percent + motor_percent_modify, i + 1);
+                c620.set_output_percent(percent, i + 1);
                 motor_dpsa[i] = motor_dps * 180 / M_PI;
                 motor_goal[i] = goal_ang_vel;
             }
@@ -385,12 +458,12 @@ int main()
             
             CANMessage msg1(CAN_ID1, (const uint8_t *)&pwm1, 8);
             CANMessage msg2(CAN_ID2, (const uint8_t *)&pwm2, 8);
-            CANMessage msg_servo(CAN_ID_SERVO, (const uint8_t *)&servo1, 8);
             can1.write(msg1);
             can1.write(msg2);
-            can1.write(msg_servo);
-            servo_corn_contain.move(servo_corn_deg);
-            servo_seesaw.move(servo_seesaw_deg);
+            // servo_corn_contain.move(servo_corn_deg);
+            // servo_seesaw.move(servo_seesaw_deg);
+            // servo_corn_contain_sub.move(servo_corn_deg);
+            // servo_seesaw_sub.move(servo_seesaw_deg);
 
             pre = now;
         }
